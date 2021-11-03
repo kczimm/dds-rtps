@@ -3,6 +3,28 @@
 //! interface, and more generally, all that is needed by the application to
 //! define [`Topic`] objects and attach QoS policies to them.
 
+use std::{error::Error, fmt};
+
+#[derive(Debug)]
+pub enum TopicError {
+    InconsistentTopic,
+}
+
+impl fmt::Display for TopicError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                Self::InconsistentTopic =>
+                    "another topic exists with the same name but different characteristics",
+            }
+        )
+    }
+}
+
+impl Error for TopicError {}
+
 #[derive(Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
 pub struct TopicDescription {
     type_name: String,
