@@ -5,6 +5,8 @@
 
 use std::{error::Error, fmt};
 
+use crate::domain::DomainParticipant;
+
 #[derive(Debug)]
 pub enum TopicError {
     InconsistentTopic,
@@ -31,12 +33,35 @@ pub struct TopicDescription {
     name: String,
 }
 
+impl TopicDescription {
+    pub fn new(type_name: &str, name: &str) -> Self {
+        Self {
+            type_name: String::from(type_name),
+            name: String::from(name),
+        }
+    }
+
+    pub fn get_participant(&self) -> &DomainParticipant {
+        todo!()
+    }
+
+    pub fn get_type_name(&self) -> &str {
+        self.type_name.as_str()
+    }
+
+    pub fn get_name(&self) -> &str {
+        self.name.as_str()
+    }
+}
+
 /// A [`Topic`] is identified by its name, which must be unique in the whole
 /// Domain. In addition (by virtue of extending [`TopicDescription`]) it fully
 /// specifies the type of the data that can be communicated when publishing or
 /// subscribing to the [Topic].
 #[derive(Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
-pub struct Topic;
+pub struct Topic {
+    description: TopicDescription,
+}
 
 /// [`ContentFilteredTopic`] describes a more sophisticated subscription that
 /// indicates the subscriber does not want to necessarily see all values of each
