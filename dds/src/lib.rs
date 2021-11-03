@@ -11,5 +11,6 @@
 pub mod domain;
 pub mod infrastructure;
 pub mod publication;
+pub mod qos;
 pub mod subscription;
 pub mod topic;
