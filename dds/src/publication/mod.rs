@@ -2,7 +2,7 @@
 //! as the PublisherListener and DataWriterListener interfaces, and more
 //! generally, all that is needed on the publication side.
 
-use crate::{qos::QosPolicy, topic::Topic};
+use crate::{qos::QoS, topic::Topic};
 
 #[derive(Debug)]
 pub struct Publisher;
@@ -12,7 +12,7 @@ impl Publisher {
         todo!()
     }
 
-    pub fn create_datawriter<D>(&mut self, _topic: &Topic, _qos: &QosPolicy) -> DataWriter<D> {
+    pub fn create_datawriter<D>(&mut self, _topic: &Topic, _qos: &QoS) -> DataWriter<D> {
         todo!()
     }
 
@@ -52,11 +52,11 @@ impl Publisher {
         todo!()
     }
 
-    pub fn set_default_datawriter_qos(&mut self, _qos_list: &Vec<QosPolicy>) {
+    pub fn set_default_datawriter_qos(&mut self, _qos_list: &Vec<QoS>) {
         todo!()
     }
 
-    pub fn get_default_datawriter_qos(&self) -> &Vec<QosPolicy> {
+    pub fn get_default_datawriter_qos(&self) -> &Vec<QoS> {
         todo!()
     }
 

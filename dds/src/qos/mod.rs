@@ -1,10 +1,13 @@
-//! A QoS (Quality of Service) is a set of characteristics that
+//! A [`QoS`] (Quality of Service) is a set of characteristics that
 //! controls some aspect of the behavior of the DDS Service.
 
 use std::cmp::Ordering;
 
-#[derive(Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
-pub struct QosPolicy {
+/// [`QoS`] (i.e., a list of QosPolicy objects) may be associated with all
+/// Entity objects in the system such as [`Topic`], [`DataWriter`],
+/// [`DataReader`], [`Publisher`], [`Subscriber`], and [`DomainParticipant`].
+#[derive(Debug, Default, PartialEq, PartialOrd, Hash, Eq, Ord)]
+pub struct QoS {
     user_data: Option<UserData>,
     topic_data: Option<TopicData>,
     group_data: Option<GroupData>,
@@ -28,6 +31,45 @@ pub struct QosPolicy {
     reader_data_lifecycle: Option<ReaderDataLifecycle>,
 }
 
+impl QoS {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn durability(&mut self, kind: DurabilityKind) -> &mut Self {
+        self.durability = Some(Durability { kind });
+        self
+    }
+
+    pub fn history(&mut self, kind: HistoryKind, depth: Option<usize>) -> &mut Self {
+        self.history = Some(History { kind, depth });
+        self
+    }
+
+    pub fn reliability(&mut self, kind: ReliabilityKind, max_blocking_time: Duration) -> &mut Self {
+        self.reliability = Some(Reliability {
+            kind,
+            max_blocking_time,
+        });
+        self
+    }
+
+    pub fn build(self) -> Self {
+        self
+    }
+}
+
+/// The purpose of this QoS is to allow the application to attach additional
+/// information to the created Entity objects such that when
+/// a remote application discovers their existence it can access that
+/// information and use it for its own purposes. One possible use of this QoS is
+/// to attach security credentials or some other information that can be used by
+/// the remote application to authenticate the source. In combination with
+/// operations such as ignore_participant, ignore_publication,
+/// ignore_subscription, and ignore_topic these QoS can assist an application to
+/// define and enforce its own security policies. The use of this QoS is not
+/// limited to security, rather it offers a simple, yet flexible extensibility
+/// mechanism.
 #[derive(Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
 pub struct UserData {
     value: Vec<u8>,
@@ -120,7 +162,7 @@ pub struct DestinationOrder {
 #[derive(Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
 pub struct History {
     kind: HistoryKind,
-    depth: i32,
+    depth: Option<usize>,
 }
 
 #[derive(Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
