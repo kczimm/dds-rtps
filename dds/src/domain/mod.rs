@@ -41,6 +41,11 @@ impl DomainParticipantFactory {
 #[derive(Debug)]
 pub struct DomainParticipant {
     domain_id: DomainId,
+    publishers: Vec<Publisher>,
+    subscribers: Vec<Subscriber>,
+    topics: Vec<Topic>,
+    content_filtered_topics: Vec<ContentFilteredTopic>,
+    multi_topics: Vec<MultiTopic>,
 }
 
 impl DomainParticipant {

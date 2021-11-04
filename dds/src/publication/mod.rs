@@ -66,6 +66,48 @@ impl Publisher {
 }
 
 #[derive(Debug)]
-pub struct DataWriter<Data> {
-    _phantom: std::marker::PhantomData<Data>,
+pub struct DataWriter<Foo> {
+    _phantom: std::marker::PhantomData<Foo>,
+}
+
+impl<Foo> DataWriter<Foo> {
+    pub fn register_instance(&mut self, _instance: Foo) {
+        todo!()
+    }
+
+    pub fn register_instance_w_timestamp(
+        &mut self,
+        _instance: Foo,
+        _timestamp: std::time::SystemTime,
+    ) {
+        todo!()
+    }
+
+    pub fn unregister_instance(&mut self, _instance: Foo) {
+        todo!()
+    }
+
+    pub fn unregister_instance_w_timestamp(
+        &mut self,
+        _instance: Foo,
+        _timestamp: std::time::SystemTime,
+    ) {
+        todo!()
+    }
+
+    pub fn get_key_value(&self, _key_holder: Foo) {
+        todo!()
+    }
+
+    pub fn write(&self, _instance_data: Foo) {
+        todo!()
+    }
+
+    pub fn dispose(&self, _instance: Foo) {
+        todo!()
+    }
+
+    pub fn dispose_w_timestamp(&self, _instance: Foo, _timestamp: std::time::SystemTime) {
+        todo!()
+    }
 }
