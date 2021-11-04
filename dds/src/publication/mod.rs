@@ -1,6 +1,47 @@
 //! The Publication Module contains the Publisher and DataWriter classes as well
 //! as the PublisherListener and DataWriterListener interfaces, and more
 //! generally, all that is needed on the publication side.
+//!
+//!
+//! # Publication View Example
+//!
+//! Code example from the sequence diagram in Section 2.2.6.1 of the [specification](https://www.omg.org/spec/DDS/1.4/PDF).
+//!
+//! ```no_run
+//! struct Shape {
+//!     color: String,
+//!     x: i32,
+//!     y: i32,
+//!     shapesize: i32,
+//! }
+//!
+//! fn main() {
+//!     let domain_id = 0;
+//!     let dp = DomainParticipant::new(domain_id)?;
+//!
+//!     let topic = dp.create_topic("Shape", QoS::topic_default())?;
+//!     let mut publisher = dp.create_publisher(QoS::publisher_default())?;
+//!     let mut writer = publisher.create_datawriter::<Shape>(topic, QoS::datawriter_default())?;
+//!
+//!     let sample = Shape {
+//!         color: "Blue".into(),
+//!         x: 0,
+//!         y: 0,
+//!         shapesize: 1,
+//!     };
+//!
+//!     writer.write(&sample)?;
+//!     writer.dispose(&sample)?;
+//!
+//!     publisher.suspend_publications();
+//!
+//!     writer.write(&sample)?;
+//!     writer.dispose(&sample)?;
+//!     writer.write(&sample)?;
+//!
+//!     publisher.resume_publications();
+//! }
+//! ```
 
 use crate::{qos::QoS, topic::Topic};
 
