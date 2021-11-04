@@ -15,7 +15,7 @@
 //!     shapesize: i32,
 //! }
 //!
-//! fn main() {
+//! async fn publish() {
 //!     let domain_id = 0;
 //!     let dp = DomainParticipant::new(domain_id)?;
 //!
@@ -30,14 +30,14 @@
 //!         shapesize: 1,
 //!     };
 //!
-//!     writer.write(&sample)?;
-//!     writer.dispose(&sample)?;
+//!     writer.write(&sample).await?;
+//!     writer.dispose(&sample).await?;
 //!
 //!     publisher.suspend_publications();
 //!
-//!     writer.write(&sample)?;
-//!     writer.dispose(&sample)?;
-//!     writer.write(&sample)?;
+//!     writer.write(&sample).await?;
+//!     writer.dispose(&sample).await?;
+//!     writer.write(&sample).await?;
 //!
 //!     publisher.resume_publications();
 //! }
