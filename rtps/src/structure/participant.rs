@@ -1,11 +1,17 @@
+use crate::behavior::cache::VecCache;
+
 use super::{
     historycache::HistoryCache, EntityId, Guid, Locator, ProtocolVersion, ReliabilityKind,
     TopicKind,
 };
 
-/// RTPS Participant is the container of RTPS Group entities which contain Endpoint entities. The RTPS
-/// Participant maps to a DDS DomainParticipant.
-struct Participant<Cache: HistoryCache> {
+/// RTPS Participant is the container of RTPS Group entities which contain
+/// Endpoint entities. The RTPS Participant maps to a DDS DomainParticipant.
+#[derive(Debug)]
+pub struct Participant<Cache = VecCache>
+where
+    Cache: HistoryCache,
+{
     guid: Guid,
     protocol_version: ProtocolVersion,
     default_unicast_locator_list: Vec<Locator>,
@@ -15,15 +21,20 @@ struct Participant<Cache: HistoryCache> {
     subscribers: Group<Reader, Cache>,
 }
 
-struct Writer;
-struct Reader;
+#[derive(Debug)]
+pub struct Writer;
 
-struct Group<Type, Cache: HistoryCache> {
+#[derive(Debug)]
+pub struct Reader;
+
+#[derive(Debug)]
+pub struct Group<Type, Cache: HistoryCache> {
     guid: Guid,
     endpoints: Vec<Endpoint<Type, Cache>>,
 }
 
-struct Endpoint<Type, Cache: HistoryCache> {
+#[derive(Debug)]
+pub struct Endpoint<Type, Cache: HistoryCache> {
     guid: Guid,
     topic_kind: TopicKind,
     reliability_level: ReliabilityKind,

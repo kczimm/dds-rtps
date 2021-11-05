@@ -5,6 +5,7 @@ use crate::structure::{
 
 use super::Duration;
 
+#[derive(Debug)]
 pub struct Writer<Cache> {
     guid: Guid,
     push_mode: bool,

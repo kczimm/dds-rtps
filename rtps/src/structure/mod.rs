@@ -8,7 +8,7 @@ pub mod participant;
 /// RTPS Entity represents the class of objects that are visible to other RTPS
 /// Entities on the network. As such, RTPS Entity objects have a globally-unique
 /// identifier (GUID) and can be referenced inside RTPS messages.
-trait Entity {
+pub trait Entity {
     fn entity(&self) -> Guid;
 }
 
@@ -49,6 +49,7 @@ pub type SequenceNumber = i64;
 /// - LOCATOR_KIND_UDPv6
 /// - LOCATOR_ADDRESS_INVALID
 /// - LOCATOR_PORT_INVALID
+#[derive(Debug)]
 pub struct Locator {
     discrimiator: SocketAddr,
 }
@@ -59,6 +60,7 @@ pub struct Locator {
 /// The following values are reserved by the protocol:
 /// - NO_KEY
 /// - WITH_KEY
+#[derive(Debug)]
 enum TopicKind {
     WithKey,
     NoKey,
@@ -72,7 +74,7 @@ enum TopicKind {
 /// - NOT_ALIVE_DISPOSED
 /// - NOT_ALIVE_UNREGISTERED
 #[derive(Debug, PartialEq)]
-enum ChangeKind {
+pub enum ChangeKind {
     Alive,
     AliveFiltered,
     NotAliveDisposed,
@@ -88,7 +90,8 @@ pub type ChangeCount = u64;
 /// communications. It can take the values:
 /// - BEST_EFFORT
 /// - RELIABLE
-enum ReliabilityKind {
+#[derive(Debug)]
+pub enum ReliabilityKind {
     BestEffort,
     Reliable,
 }
@@ -96,7 +99,7 @@ enum ReliabilityKind {
 /// Type used to represent the identity of a data-object whose changes in value
 /// are communicated by the RTPS protocol.
 #[derive(Debug, PartialEq)]
-struct InstanceHandle;
+pub struct InstanceHandle;
 
 /// Type used to represent the version of the RTPS protocol. The version is
 /// composed of a major and a minor version number. See also 8.6.
@@ -111,7 +114,8 @@ struct InstanceHandle;
 ///
 /// PROTOCOLVERSION is an alias for the most recent version, in this case
 /// PROTOCOLVERSION_2_4
-pub(crate) struct ProtocolVersion {
+#[derive(Debug)]
+pub struct ProtocolVersion {
     major: (),
     minor: (),
 }
@@ -120,4 +124,5 @@ pub(crate) struct ProtocolVersion {
 /// protocol. The possible values for the vendorId are assigned by the OMG.
 /// The following values are reserved by the protocol:
 /// - VENDORID_UNKNOWN
-pub(crate) struct VendorId;
+#[derive(Debug)]
+pub struct VendorId;

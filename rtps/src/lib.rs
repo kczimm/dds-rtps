@@ -15,7 +15,7 @@
 #![deny(rust_2018_idioms)]
 #![allow(dead_code)]
 
-mod behavior;
-mod discovery;
-mod messages;
-mod structure;
+pub mod behavior;
+pub mod discovery;
+pub mod messages;
+pub mod structure;

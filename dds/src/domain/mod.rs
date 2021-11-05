@@ -9,6 +9,8 @@ use crate::{
     topic::{ContentFilteredTopic, MultiTopic, Topic},
 };
 
+use rtps::structure::participant::Participant;
+
 #[derive(Debug)]
 pub struct DomainParticipantFactory;
 
@@ -46,6 +48,8 @@ pub struct DomainParticipant {
     topics: Vec<Topic>,
     content_filtered_topics: Vec<ContentFilteredTopic>,
     multi_topics: Vec<MultiTopic>,
+
+    related_rtps_participant: Participant,
 }
 
 impl DomainParticipant {

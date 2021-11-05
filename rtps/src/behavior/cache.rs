@@ -3,6 +3,7 @@ use crate::structure::{
     SequenceNumber,
 };
 
+#[derive(Debug)]
 pub struct VecCache {
     changes: Vec<CacheChange>,
 }
