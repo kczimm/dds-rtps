@@ -6,6 +6,7 @@
 //! See Secion 8.4 of the [specification](https://www.omg.org/spec/DDSI-RTPS/2.5/PDF#page=72)
 
 pub mod cache;
+pub mod reader;
 pub mod writer;
 
 /// Type used to hold time differences.
