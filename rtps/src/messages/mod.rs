@@ -21,6 +21,7 @@ const PROTOCOL_RTPS: ProtocolId = ['R' as _, 'T' as _, 'P' as _, 'S' as _];
 type SubmessageFlag = bool;
 
 /// Enumeration used to identify the kind of Submessage.
+#[derive(Clone, Copy, Debug, PartialOrd, PartialEq, Hash, Eq, Ord)]
 #[repr(u8)]
 enum SubmessageKind {
     RtpsHe = 0x00,
@@ -40,49 +41,59 @@ enum SubmessageKind {
 }
 
 /// Type used to hold a timestamp.
-/// Should have at least nano-second resolution.
-/// The following values are reserved by the protocol:
-/// - TIME_ZERO
-/// - TIME_INVALID
-/// - TIME_INFINITE
-struct Time(std::time::SystemTime);
+#[derive(Clone, Copy, Debug, Default, PartialEq, Hash, Eq)]
+pub struct Time {
+    seconds: u32,
+    fraction: u32,
+}
+
+impl Time {
+    #[must_use]
+    pub const fn new(seconds: u32, fraction: u32) -> Time {
+        Self { seconds, fraction }
+    }
+}
+
+pub const TIME_ZERO: Time = Time::new(0, 0);
+pub const TIME_INVALID: Time = Time::new(0xffffffff, 0xffffffff);
+pub const TIME_INFINITE: Time = Time::new(0xffffffff, 0xfffffffe);
 
 /// Type used to hold a count that is incremented monotonically, used to
 /// identify message duplicates.
-type Count = u64;
+pub type Count = u32;
 
 /// Type used to hold a checksum. Used to detect RTPS message corruption by the
 /// underlying transport.
 /// The following values are reserved by the protocol:
 /// - CHECKSUM_INVALID.
-struct CheckSum;
+pub struct CheckSum;
 
 /// Type used to hold the length of an RTPS Message.
-/// The following values are reserved by the protocol:
-/// - MESSAGE_LENGTH_INVALID
-type MessageLength = u64;
+pub type MessageLength = u32;
+
+pub const MESSAGE_LENGTH_INVALID: MessageLength = 0;
 
 /// Type used to uniquely identify a parameter in a parameter list.
 /// Used extensively by the Discovery Module mainly to define QoS Parameters. A
 /// range of values is reserved for protocol-defined parameters, while another
 /// range can be used for vendor-defined parameters, see 8.3.5.9.
-struct ParameterId;
+pub struct ParameterId;
 
 /// Type used to hold fragment numbers.
 /// Must be possible to represent using 32 bits.
-type FragmentNumber = u32;
+pub type FragmentNumber = u32;
 
 /// Type used to hold a digest value that uniquely identifies a group of
 /// Entities belonging to the same [`Participant`].
-struct GroupDigest;
+pub struct GroupDigest;
 
 /// Type used to hold an undefined 4-byte value. It is intended to be used in
 /// future revisions of the specification.
-type UExtension4 = [u8; 4];
+pub type UExtension4 = [u8; 4];
 
 /// Type used to hold an undefined 8-byte value. It is intended to be used in
 /// future revisions of the specification.
-type WExtension8 = [u8; 8];
+pub type WExtension8 = [u8; 8];
 
 /// The overall structure of an RTPS Message consists of a fixed-size leading
 /// RTPS Header followed by a variable number of RTPS Submessage parts. Each
@@ -99,7 +110,7 @@ type WExtension8 = [u8; 8];
 /// contrast, a stream-oriented transport (like TCP) would need to include the
 /// length in the RTPS HeaderExtension in order to identify the boundary of the
 /// RTPS message.
-struct Message {
+pub struct Message {
     header: Header,
     header_extension: Option<HeaderExtension>,
     submessages: Vec<Submessage>,
@@ -110,7 +121,7 @@ struct Message {
 /// The Header identifies the message as belonging to the RTPS protocol. The
 /// Header identifies the version of the protocol and the vendor that sent  the
 /// message.
-struct Header {
+pub struct Header {
     protocol: ProtocolId,
     version: ProtocolVersion,
     vendor_id: VendorId,
@@ -127,7 +138,7 @@ struct Header {
 /// the sub-message structure (see 8.3.3.3) versions of the protocol that do not
 /// understand the HeaderExtension will treat it as “unknown messge kind”, skip
 /// it, and continue processing the submessages that follow it, see 8.3.4.1.
-struct HeaderExtension {
+pub struct HeaderExtension {
     endianness_flag: SubmessageFlag,
     length_flag: SubmessageFlag,
     timestamp_flag: SubmessageFlag,
@@ -143,7 +154,7 @@ struct HeaderExtension {
     parameters: Option<ParameterList>,
 }
 
-struct ParameterList;
+pub struct ParameterList;
 
 /// Each RTPS Message consists of a variable number of RTPS Submessage parts.
 /// All RTPS Submessages feature the same identical structure.
@@ -151,12 +162,12 @@ struct ParameterList;
 /// All Submessages start with a SubmessageHeader part followed by a
 /// concatenation of SubmessageElement parts. The SubmessageHeader identifies
 /// the kind of Submessage and the optional elements within that Submessage.
-struct Submessage {
+pub struct Submessage {
     header: SubmessageHeader,
     elements: Vec<SubmessageElement>,
 }
 
-struct SubmessageHeader {
+pub struct SubmessageHeader {
     submessage_id: SubmessageKind,
     flags: [SubmessageFlag; 8],
     submessage_length: u16,
@@ -165,7 +176,7 @@ struct SubmessageHeader {
 /// Each RTPS message contains a variable number of RTPS Submessages. Each RTPS
 /// Submessage in turn is built from a set of predefined atomic building blocks
 /// called SubmessageElements.
-enum SubmessageElement {
+pub enum SubmessageElement {
     ChangeCount {
         value: ChangeCount,
     },
@@ -236,9 +247,9 @@ enum SubmessageElement {
     },
 }
 
-struct KeyHashPrefix;
-struct KeyHashSuffix;
-struct Parameter {
+pub struct KeyHashPrefix;
+pub struct KeyHashSuffix;
+pub struct Parameter {
     parameter_id: ParameterId,
     length: i16,
     value: Vec<u8>,
