@@ -31,14 +31,14 @@ impl<Cache: Default + HistoryCache> Writer<Cache> {
             heartbeat_period: Duration::new(0, 0),
             nack_response_delay: Duration::new(0, 0),
             nack_suppression_delay: Duration::new(0, 0),
-            last_change_sequence_number: 0,
+            last_change_sequence_number: SequenceNumber::default(),
             data_max_size_serialized: i32::MAX,
             cache: Cache::default(),
         }
     }
 
     pub fn new_change(&mut self) -> CacheChange {
-        self.last_change_sequence_number += 1;
+        self.last_change_sequence_number.increment();
 
         todo!()
     }

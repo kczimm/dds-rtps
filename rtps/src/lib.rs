@@ -9,10 +9,6 @@
 //! direct result, a close synergy exists between DDS and the RTPS
 //! wire-protocol, both in terms  of the underlying behavioral architecture and
 //! the features of RTPS
-
-#![deny(clippy::all)]
-#![deny(clippy::pedantic)]
-#![deny(rust_2018_idioms)]
 #![allow(dead_code)]
 
 pub mod behavior;
