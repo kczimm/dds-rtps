@@ -17,10 +17,7 @@
 //!
 //! See Section 8.2 of the [specification](https://www.omg.org/spec/DDSI-RTPS/2.5/PDF#page=21).
 
-use std::{
-    cmp::Ordering,
-    net::{IpAddr, Ipv6Addr, SocketAddr},
-};
+use std::cmp::Ordering;
 
 pub mod historycache;
 pub mod participant;
@@ -128,48 +125,51 @@ pub const SEQUENCENUMBER_UNKNOWN: SequenceNumber = SequenceNumber { high: -1, lo
 /// address, and a port number. It must be possible to represent the
 /// discriminator and port number using 4 octets each, the address using 16
 /// octets.
-#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
-pub struct Locator {
-    kind: LocatorKind,
-    port: LocatorPort,
-    address: LocatorAddress,
-}
 
-impl Locator {
-    pub fn new(kind: LocatorKind, port: LocatorPort, address: LocatorAddress) -> Self {
-        Self {
-            kind,
-            port,
-            address,
-        }
-    }
-}
+pub type Locator = std::net::SocketAddr;
 
-pub const LOCATOR_INVALID: Locator = Locator {
-    kind: LocatorKind::Invalid,
-    port: LOCATOR_PORT_INVALID,
-    address: LOCATOR_ADDRESS_INVALID,
-};
+// #[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
+// pub struct Locator {
+//     kind: LocatorKind,
+//     port: LocatorPort,
+//     address: LocatorAddress,
+// }
 
-impl TryFrom<Locator> for SocketAddr {
-    type Error = &'static str;
+// impl Locator {
+//     pub fn new(kind: LocatorKind, port: LocatorPort, address: LocatorAddress)
+// -> Self {         Self {
+//             kind,
+//             port,
+//             address,
+//         }
+//     }
+// }
 
-    fn try_from(value: Locator) -> Result<Self, Self::Error> {
-        match value.kind {
-            LocatorKind::Invalid => Err("invalid locator kind"),
-            LocatorKind::Reserved => Err("reserved locator kind"),
-            _ => {
-                let addr = Ipv6Addr::from(value.address);
-                let ip = if let Some(addr) = addr.to_ipv4() {
-                    IpAddr::V4(addr)
-                } else {
-                    IpAddr::from(addr)
-                };
-                Ok(SocketAddr::new(ip, value.port as _))
-            }
-        }
-    }
-}
+// pub const LOCATOR_INVALID: Locator = Locator {
+//     kind: LocatorKind::Invalid,
+//     port: LOCATOR_PORT_INVALID,
+//     address: LOCATOR_ADDRESS_INVALID,
+// };
+
+// impl TryFrom<Locator> for SocketAddr {
+//     type Error = &'static str;
+
+//     fn try_from(value: Locator) -> Result<Self, Self::Error> {
+//         match value.kind {
+//             LocatorKind::Invalid => Err("invalid locator kind"),
+//             LocatorKind::Reserved => Err("reserved locator kind"),
+//             _ => {
+//                 let addr = Ipv6Addr::from(value.address);
+//                 let ip = if let Some(addr) = addr.to_ipv4() {
+//                     IpAddr::V4(addr)
+//                 } else {
+//                     IpAddr::from(addr)
+//                 };
+//                 Ok(SocketAddr::new(ip, value.port as _))
+//             }
+//         }
+//     }
+// }
 
 #[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
 #[repr(i32)]

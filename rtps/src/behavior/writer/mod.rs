@@ -5,6 +5,7 @@ use crate::structure::{
 
 use super::Duration;
 
+pub mod stateful;
 pub mod stateless;
 
 pub struct Writer {
