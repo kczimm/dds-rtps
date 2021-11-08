@@ -66,6 +66,7 @@ pub type Count = u32;
 /// underlying transport.
 /// The following values are reserved by the protocol:
 /// - CHECKSUM_INVALID.
+#[derive(Clone, Copy, Debug, PartialOrd, PartialEq, Hash, Eq, Ord)]
 pub struct CheckSum;
 
 /// Type used to hold the length of an RTPS Message.
@@ -77,15 +78,14 @@ pub const MESSAGE_LENGTH_INVALID: MessageLength = 0;
 /// Used extensively by the Discovery Module mainly to define QoS Parameters. A
 /// range of values is reserved for protocol-defined parameters, while another
 /// range can be used for vendor-defined parameters, see 8.3.5.9.
-pub struct ParameterId;
+pub type ParameterId = i16;
 
 /// Type used to hold fragment numbers.
-/// Must be possible to represent using 32 bits.
 pub type FragmentNumber = u32;
 
 /// Type used to hold a digest value that uniquely identifies a group of
 /// Entities belonging to the same [`Participant`].
-pub struct GroupDigest;
+pub type GroupDigest = [u8; 4];
 
 /// Type used to hold an undefined 4-byte value. It is intended to be used in
 /// future revisions of the specification.
