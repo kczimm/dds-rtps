@@ -1,5 +1,6 @@
 use crate::structure::{
     historycache::{CacheChange, HistoryCache},
+    participant::{self, Endpoint},
     Entity, Guid, SequenceNumber,
 };
 
@@ -10,6 +11,8 @@ pub mod stateless;
 
 pub struct Writer {
     guid: Guid,
+
+    endpoint: Endpoint<participant::Writer>,
 
     push_mode: bool,
     heartbeat_period: Duration,
