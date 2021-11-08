@@ -64,10 +64,10 @@ pub type Count = u32;
 
 /// Type used to hold a checksum. Used to detect RTPS message corruption by the
 /// underlying transport.
-/// The following values are reserved by the protocol:
-/// - CHECKSUM_INVALID.
 #[derive(Clone, Copy, Debug, PartialOrd, PartialEq, Hash, Eq, Ord)]
-pub struct CheckSum;
+pub struct Checksum;
+
+pub const CHECKSUM_INVALID: Checksum = Checksum;
 
 /// Type used to hold the length of an RTPS Message.
 pub type MessageLength = u32;
@@ -150,7 +150,7 @@ pub struct HeaderExtension {
     rtps_send_timestamp: Option<Time>,
     uextention4: Option<UExtension4>,
     wextention8: Option<WExtension8>,
-    message_checksum: Option<CheckSum>,
+    message_checksum: Option<Checksum>,
     parameters: Option<ParameterList>,
 }
 
@@ -181,7 +181,7 @@ pub enum SubmessageElement {
         value: ChangeCount,
     },
     CheckSum {
-        value: CheckSum,
+        value: Checksum,
     },
     Count {
         value: Count,

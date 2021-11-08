@@ -128,7 +128,7 @@ pub const SEQUENCENUMBER_UNKNOWN: SequenceNumber = SequenceNumber { high: -1, lo
 /// address, and a port number. It must be possible to represent the
 /// discriminator and port number using 4 octets each, the address using 16
 /// octets.
-#[derive(Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
+#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
 pub struct Locator {
     kind: LocatorKind,
     port: LocatorPort,
@@ -161,7 +161,7 @@ impl TryFrom<Locator> for SocketAddr {
     }
 }
 
-#[derive(Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
+#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
 #[repr(i32)]
 pub enum LocatorKind {
     Invalid = -1,
