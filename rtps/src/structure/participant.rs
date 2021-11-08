@@ -1,3 +1,5 @@
+use std::net::SocketAddr;
+
 use super::{
     Entity, EntityId, Guid, GuidPrefix, Locator, ProtocolVersion, ReliabilityKind, TopicKind,
     VendorId,
@@ -55,8 +57,8 @@ pub struct Endpoint<Kind> {
 
     topic_kind: TopicKind,
     reliability_level: ReliabilityKind,
-    unicast_locator_list: Vec<Locator>,
-    multicast_locator_list: Vec<Locator>,
+    unicast_locator_list: Vec<SocketAddr>,
+    multicast_locator_list: Vec<SocketAddr>,
     endpoint_group: EntityId,
 
     _type: std::marker::PhantomData<Kind>,

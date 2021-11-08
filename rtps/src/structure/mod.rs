@@ -135,6 +135,16 @@ pub struct Locator {
     address: LocatorAddress,
 }
 
+impl Locator {
+    pub fn new(kind: LocatorKind, port: LocatorPort, address: LocatorAddress) -> Self {
+        Self {
+            kind,
+            port,
+            address,
+        }
+    }
+}
+
 pub const LOCATOR_INVALID: Locator = Locator {
     kind: LocatorKind::Invalid,
     port: LOCATOR_PORT_INVALID,
