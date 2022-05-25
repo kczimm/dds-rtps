@@ -3,7 +3,10 @@
 //!
 //! See Section 9 of the specification for more details.
 
+#![allow(dead_code)]
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
+
+mod entity;
 
 struct PortNumberParams {
     domain_id_gain: u16,
