@@ -1,7 +1,7 @@
 use crate::structure::{
     historycache::HistoryCache,
     participant::{self, Endpoint},
-    Entity, Guid,
+    Guid,
 };
 
 use super::Duration;
@@ -17,11 +17,5 @@ pub struct Reader {
     expects_inline_qos: bool,
     heartbeat_response_delay: Duration,
 
-    reader_cache: Box<dyn HistoryCache>,
-}
-
-impl Entity for Reader {
-    fn entity(&self) -> Guid {
-        self.guid
-    }
+    reader_cache: Box<HistoryCache>,
 }

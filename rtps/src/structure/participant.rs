@@ -1,6 +1,5 @@
 use super::{
-    Entity, EntityId, Guid, GuidPrefix, Locator, ProtocolVersion, ReliabilityKind, TopicKind,
-    VendorId,
+    EntityId, Guid, GuidPrefix, Locator, ProtocolVersion, ReliabilityKind, TopicKind, VendorId,
 };
 
 /// RTPS [`Participant`] is the container of RTPS [`Group`] entities which
@@ -20,12 +19,6 @@ pub struct Participant {
     subscribers: Vec<Subscriber>,
 }
 
-impl Entity for Participant {
-    fn entity(&self) -> Guid {
-        self.guid
-    }
-}
-
 #[derive(Debug)]
 pub struct Group<Kind> {
     guid: Guid,
@@ -43,12 +36,6 @@ pub struct Reader;
 pub type Publisher = Group<Writer>;
 pub type Subscriber = Group<Reader>;
 
-impl<Kind> Entity for Group<Kind> {
-    fn entity(&self) -> Guid {
-        self.guid
-    }
-}
-
 #[derive(Debug)]
 pub struct Endpoint<Kind> {
     guid: Guid,
@@ -60,12 +47,6 @@ pub struct Endpoint<Kind> {
     endpoint_group: EntityId,
 
     _type: std::marker::PhantomData<Kind>,
-}
-
-impl<Kind> Entity for Endpoint<Kind> {
-    fn entity(&self) -> Guid {
-        self.guid
-    }
 }
 
 impl Endpoint<Writer> {}

@@ -7,9 +7,23 @@ pub struct StatelessWriter {
     reader_locators: Vec<ReaderLocator>,
 }
 
+impl StatelessWriter {
+    pub fn reader_locator_add(&mut self, _reader: ReaderLocator) {
+        todo!()
+    }
+
+    pub fn reader_locator_remove(&mut self, _reader: &ReaderLocator) {
+        todo!()
+    }
+
+    pub fn unsent_changes_reset(&mut self) {
+        todo!()
+    }
+}
+
 pub struct ReaderLocator {
-    highest_sent_change_sn: Option<SequenceNumber>,
-    requested_changes: Vec<SequenceNumber>,
+    requested_changes: Vec<CacheChange>,
+    highest_sent_change: Option<CacheChange>,
 }
 
 impl ReaderLocator {

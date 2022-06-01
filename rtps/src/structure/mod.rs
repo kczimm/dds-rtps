@@ -22,14 +22,6 @@ use std::cmp::Ordering;
 pub mod historycache;
 pub mod participant;
 
-/// RTPS [`Entity`] represents the class of objects that are visible to other
-/// RTPS Entities on the network. As such, RTPS [`Entity`] objects have a
-/// globally-unique identifier ([`Guid`]) and can be referenced inside RTPS
-/// messages.
-pub trait Entity {
-    fn entity(&self) -> Guid;
-}
-
 /// Type used to hold globally-unique RTPS-entity identifiers. These are
 /// identifiers used to uniquely refer to each RTPS Entity in the system. Must
 /// be possible to represent using 16 octets.
@@ -192,7 +184,7 @@ pub const LOCATOR_ADDRESS_INVALID: LocatorAddress = [0; 16];
 /// within to be used as the ‘key’ that identifies data-instances within the
 /// Topic. See the DDS specification for more details on keys.
 #[derive(Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
-enum TopicKind {
+pub enum TopicKind {
     WithKey,
     NoKey,
 }

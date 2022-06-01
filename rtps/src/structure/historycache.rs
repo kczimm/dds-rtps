@@ -1,30 +1,47 @@
 use super::{ChangeKind, Guid, InstanceHandle, SequenceNumber};
 
-/// Container class used to temporarily store and manage sets of changes to
-/// data-objects. On the Writer side it contains the history of the changes to
-/// data-objects made by the Writer. It is not necessary that the full history
-/// of all changes ever made is maintained. Rather what is needed is the partial
-/// history required to service existing and future matched RTPS Reader
-/// endpoints. The partial history needed depends on the DDS QoS and the state
-/// of the communications with the matched Reader endpoints. On the Reader side
-/// it contains the history of the changes to data-objects made by the
-/// matched RTPS Writer endpoints. It is not necessary that the full history of
-/// all changes ever received is maintained. Rather what is needed is a partial
-/// history containing the superposition of the changes received from the
-/// matched writers as needed to satisfy the needs of the corresponding DDS
-/// DataReader. The rules for this superposition and the amount of partial
-/// history required depend on the DDS QoS and the state of the communication
-/// with the matched RTPS Writer endpoints.
-pub trait HistoryCache {
-    fn add_change(&mut self, change: CacheChange);
+pub struct HistoryCache {
+    changes: Vec<CacheChange>,
+}
 
-    fn remove_change(&mut self, change: &CacheChange);
+impl HistoryCache {
+    /// See section 8.2.2.1 of the [specification](https://www.omg.org/spec/DDSI-RTPS/).
+    pub fn new() -> Self {
+        Self {
+            changes: Vec::new(),
+        }
+    }
 
-    fn get_change(&self) -> Option<&CacheChange>;
+    /// See section 8.2.2.2 of the [specification](https://www.omg.org/spec/DDSI-RTPS/).
+    fn add_change(&mut self, change: CacheChange) {
+        self.changes.push(change);
+    }
 
-    fn get_seq_num_min(&self) -> Option<SequenceNumber>;
+    /// See section 8.2.2.3 of the [specification](https://www.omg.org/spec/DDSI-RTPS/).
+    fn remove_change(&mut self, change: &CacheChange) -> Option<CacheChange> {
+        match self
+            .changes
+            .iter()
+            .position(|c| c.sequence_number == change.sequence_number)
+        {
+            Some(index) => Some(self.changes.remove(index)),
+            None => None,
+        }
+    }
 
-    fn get_seq_num_max(&self) -> Option<SequenceNumber>;
+    fn get_change(&self) -> Option<&CacheChange> {
+        todo!()
+    }
+
+    /// See section 8.2.2.4 of the [specification](https://www.omg.org/spec/DDSI-RTPS/).
+    fn get_seq_num_min(&self) -> Option<SequenceNumber> {
+        self.changes.iter().map(|c| c.sequence_number).min()
+    }
+
+    /// See section 8.2.2.5 of the [specification](https://www.omg.org/spec/DDSI-RTPS/).
+    fn get_seq_num_max(&self) -> Option<SequenceNumber> {
+        self.changes.iter().map(|c| c.sequence_number).max()
+    }
 }
 
 /// Represents an individual change made to a data-object. Includes the

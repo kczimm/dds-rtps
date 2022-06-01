@@ -7,15 +7,29 @@ pub struct StatefulWriter {
     matched_readers: Vec<ReaderProxy>,
 }
 
+impl StatefulWriter {
+    pub fn is_acked_by_all() -> bool {
+        todo!()
+    }
+
+    pub fn matched_reader_add(&mut self, _reader: ReaderProxy) {
+        todo!()
+    }
+
+    pub fn matched_reader_remove(&mut self, _reader: &ReaderProxy) {
+        todo!()
+    }
+}
+
 pub struct ReaderProxy {
     remote_reader_guid: Guid,
     remote_group_guid: Guid,
     expects_inline_qos: bool,
     unicast_locator_list: Vec<Locator>,
     multicast_locator_list: Vec<Locator>,
-    highest_sent_change_sn: Option<SequenceNumber>,
-    requested_changes: Vec<SequenceNumber>,
-    acknowledged_changes: Vec<SequenceNumber>,
+    highest_sent_change: Option<CacheChange>,
+    requested_changes: Vec<CacheChange>,
+    acknowledged_changes: Vec<CacheChange>,
 }
 
 impl ReaderProxy {
