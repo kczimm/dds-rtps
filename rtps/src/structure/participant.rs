@@ -1,3 +1,5 @@
+use crate::behavior::{reader::Reader, writer::Writer};
+
 use super::{
     EntityId, Guid, GuidPrefix, Locator, ProtocolVersion, ReliabilityKind, TopicKind, VendorId,
 };
@@ -26,13 +28,6 @@ pub struct Group<Kind> {
     endpoints: Vec<Endpoint<Kind>>,
 }
 
-/// Writer
-#[derive(Debug)]
-pub struct Writer;
-
-#[derive(Debug)]
-pub struct Reader;
-
 pub type Publisher = Group<Writer>;
 pub type Subscriber = Group<Reader>;
 
@@ -48,6 +43,3 @@ pub struct Endpoint<Kind> {
 
     _type: std::marker::PhantomData<Kind>,
 }
-
-impl Endpoint<Writer> {}
-impl Endpoint<Reader> {}

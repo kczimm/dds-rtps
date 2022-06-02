@@ -52,8 +52,12 @@ pub struct CacheChange {
     writer_guid: Guid,
     instance_handle: InstanceHandle,
     pub(crate) sequence_number: SequenceNumber,
-    data_value: Vec<Data>,
+    data_value: Option<Data>,
+    inline_qos: ParameterList,
 }
+
+#[derive(Debug, PartialEq)]
+struct ParameterList;
 
 /// Represents the data that may be associated with a change made to a
 /// data-object.
