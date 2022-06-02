@@ -1,30 +1,74 @@
 //! Structure module.
 //!
-//! # Section 8.2.1 Overview
-//!
-//! RTPS entities are the protocol-level endpoints used by the
-//! application-visible DDS entities in order to communicate with each other.
-//!
-//! Each RTPS Entity is in a one-to-one correspondence with a DDS Entity. The
-//! HistoryCache forms the interface between the DDS Entities and their
-//! corresponding RTPS Entities. For example, each write operation on a DDS
-//! DataWriter adds a CacheChange to the HistoryCache of its corresponding RTPS
-//! Writer. The RTPS Writer subsequently transfers the CacheChange to the
-//! HistoryCache of all matching RTPS Readers. On the receiving side, the DDS
-//! DataReader is notified by the RTPS Reader that a new CacheChange has arrived
-//! in the HistoryCache, at which point the DDS DataReader may choose  to access
-//! it using the DDS read or take API.
-//!
 //! See Section 8.2 of the [specification](https://www.omg.org/spec/DDSI-RTPS/2.5/PDF#page=21).
 
 use std::cmp::Ordering;
 
-pub mod historycache;
-pub mod participant;
+/// See Section 8.2.2 of the [specification](https://www.omg.org/spec/DDSI-RTPS/2.5/PDF#page=25)
+#[derive(Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
+pub struct HistoryCache {
+    changes: Vec<CacheChange>,
+}
 
-/// Type used to hold globally-unique RTPS-entity identifiers. These are
-/// identifiers used to uniquely refer to each RTPS Entity in the system. Must
-/// be possible to represent using 16 octets.
+impl HistoryCache {
+    /// See section 8.2.2.1 of the [specification](https://www.omg.org/spec/DDSI-RTPS/).
+    pub fn new() -> Self {
+        Self {
+            changes: Vec::new(),
+        }
+    }
+
+    /// See section 8.2.2.2 of the [specification](https://www.omg.org/spec/DDSI-RTPS/).
+    pub fn add_change(&mut self, change: CacheChange) {
+        self.changes.push(change);
+    }
+
+    /// See section 8.2.2.3 of the [specification](https://www.omg.org/spec/DDSI-RTPS/).
+    pub fn remove_change(&mut self, change: &CacheChange) -> Option<CacheChange> {
+        match self
+            .changes
+            .iter()
+            .position(|c| c.sequence_number == change.sequence_number)
+        {
+            Some(index) => Some(self.changes.remove(index)),
+            None => None,
+        }
+    }
+
+    /// See section 8.2.2.4 of the [specification](https://www.omg.org/spec/DDSI-RTPS/).
+    pub fn get_seq_num_min(&self) -> Option<SequenceNumber> {
+        self.changes.iter().map(|c| c.sequence_number).min()
+    }
+
+    /// See section 8.2.2.5 of the [specification](https://www.omg.org/spec/DDSI-RTPS/).
+    pub fn get_seq_num_max(&self) -> Option<SequenceNumber> {
+        self.changes.iter().map(|c| c.sequence_number).max()
+    }
+}
+
+/// See section 8.2.3 of the [specification](https://www.omg.org/spec/DDSI-RTPS/2.5/PDF#page=28).
+#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
+pub struct CacheChange {
+    kind: ChangeKind,
+    writer_guid: Guid,
+    instance_handle: InstanceHandle,
+    sequence_number: SequenceNumber,
+    data_value: Option<Data>,
+    inline_qos: ParameterList,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
+pub struct ParameterList;
+
+#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
+pub struct Data;
+
+/// See section 8.2.4 of the [specification](https://www.omg.org/spec/DDSI-RTPS/2.5/PDF#page=28).
+#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
+pub struct Entity {
+    guid: Guid,
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
 pub struct Guid {
     guid_prefix: GuidPrefix,
@@ -40,16 +84,10 @@ impl Guid {
     }
 }
 
-/// Type used to hold the prefix of the globally-unique RTPS-entity identifiers.
-/// The GUIDs of entities belonging to the same participant all have the same
-/// prefix (see 8.2.4.3). Must be possible to represent using 12 octets.
 pub type GuidPrefix = [u8; 12];
 
 pub const GUIDPREFIX_UNKNOWN: GuidPrefix = [0; 12];
 
-/// Type used to hold the suffix part of the globally-unique RTPS-entity
-/// identifiers. The [`EntityId`] uniquely identifies an [`Entity`] within a
-/// [`Participant`]. Must be possible to represent using 4 octets.
 #[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
 pub struct EntityId {
     entity_key: [u8; 3],
@@ -79,8 +117,6 @@ pub const ENTITYID_SEDP_BUILTIN_TOPICS_DETECTOR: EntityId = EntityId::new([0, 0,
 pub const ENTITYID_SEDP_BUILTIN_MESSAGE_WRITER: EntityId = EntityId::new([0, 2, 0], 0xc2);
 pub const ENTITYID_SEDP_BUILTIN_MESSAGE_READER: EntityId = EntityId::new([0, 2, 0], 0xc7);
 
-/// Type used to hold sequence numbers. Must be possible to represent using 64
-/// bits.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Hash, Eq, Ord)]
 pub struct SequenceNumber {
     high: i32,
@@ -111,57 +147,7 @@ impl PartialOrd for SequenceNumber {
 
 pub const SEQUENCENUMBER_UNKNOWN: SequenceNumber = SequenceNumber { high: -1, low: 0 };
 
-/// Type used to represent the addressing information needed to send a message
-/// to an RTPS Endpoint using one of the supported transports.
-/// Should be able to hold a discriminator identifying the kind of transport, an
-/// address, and a port number. It must be possible to represent the
-/// discriminator and port number using 4 octets each, the address using 16
-/// octets.
-
 pub type Locator = std::net::SocketAddr;
-
-// #[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
-// pub struct Locator {
-//     kind: LocatorKind,
-//     port: LocatorPort,
-//     address: LocatorAddress,
-// }
-
-// impl Locator {
-//     pub fn new(kind: LocatorKind, port: LocatorPort, address: LocatorAddress)
-// -> Self {         Self {
-//             kind,
-//             port,
-//             address,
-//         }
-//     }
-// }
-
-// pub const LOCATOR_INVALID: Locator = Locator {
-//     kind: LocatorKind::Invalid,
-//     port: LOCATOR_PORT_INVALID,
-//     address: LOCATOR_ADDRESS_INVALID,
-// };
-
-// impl TryFrom<Locator> for SocketAddr {
-//     type Error = &'static str;
-
-//     fn try_from(value: Locator) -> Result<Self, Self::Error> {
-//         match value.kind {
-//             LocatorKind::Invalid => Err("invalid locator kind"),
-//             LocatorKind::Reserved => Err("reserved locator kind"),
-//             _ => {
-//                 let addr = Ipv6Addr::from(value.address);
-//                 let ip = if let Some(addr) = addr.to_ipv4() {
-//                     IpAddr::V4(addr)
-//                 } else {
-//                     IpAddr::from(addr)
-//                 };
-//                 Ok(SocketAddr::new(ip, value.port as _))
-//             }
-//         }
-//     }
-// }
 
 #[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
 #[repr(i32)]
@@ -180,19 +166,13 @@ pub type LocatorAddress = [u8; 16];
 
 pub const LOCATOR_ADDRESS_INVALID: LocatorAddress = [0; 16];
 
-/// Enumeration used to distinguish whether a Topic has defined some fields
-/// within to be used as the ‘key’ that identifies data-instances within the
-/// Topic. See the DDS specification for more details on keys.
-#[derive(Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
+#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
 pub enum TopicKind {
     WithKey,
     NoKey,
 }
 
-/// Enumeration used to distinguish the kind of change that was made to a
-/// data-object. Includes changes to the data or the instance state of the
-/// data-object.
-#[derive(Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
+#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
 pub enum ChangeKind {
     Alive,
     AliveFiltered,
@@ -200,9 +180,6 @@ pub enum ChangeKind {
     NotAliveUnregistered,
 }
 
-/// Type used to hold a counter representing the number of [`HistoryCache`]
-/// changes that belong to a certain category. For example, the number of
-/// changes that have been filtered for an RTPS [`Reader`] [`Endpoint`].
 #[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
 pub struct ChangeCount {
     high: i32,
@@ -216,22 +193,16 @@ impl ChangeCount {
     }
 }
 
-/// Enumeration used to indicate the level of the reliability used for
-/// communications.
-#[derive(Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
+#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
 #[repr(i32)]
 pub enum ReliabilityKind {
     BestEffort = 1,
     Reliable = 2,
 }
 
-/// Type used to represent the identity of a data-object whose changes in value
-/// are communicated by the RTPS protocol.
-#[derive(Debug, Default, PartialEq, PartialOrd, Hash, Eq, Ord)]
+#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
 pub struct InstanceHandle;
 
-/// Type used to represent the version of the RTPS protocol. The version is
-/// composed of a major and a minor version number. See also 8.6.
 #[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
 pub struct ProtocolVersion {
     major: u8,
@@ -253,11 +224,44 @@ impl Default for ProtocolVersion {
     }
 }
 
-/// Type used to represent the vendor of the service implementing the RTPS
-/// protocol. The possible values for the vendorId are assigned by the OMG.
 pub type VendorId = [u8; 2];
 
 pub const VENDORID_UNKNOWN: VendorId = [0; 2];
+
+/// See Section 8.2.5 of the [specification](https://www.omg.org/spec/DDSI-RTPS/2.5/PDF#page=30)
+#[derive(Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
+pub struct Participant {
+    entity: Entity,
+
+    protocol_version: ProtocolVersion,
+    vendor_id: VendorId,
+    default_unicast_locator_list: Vec<Locator>,
+    default_multicast_locator_list: Vec<Locator>,
+    guid_prefix: GuidPrefix,
+
+    publishers: Vec<Group>,
+    subscribers: Vec<Group>,
+}
+
+/// See Section 8.2.6 of the [specification](https://www.omg.org/spec/DDSI-RTPS/2.5/PDF#page=31)
+#[derive(Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
+pub struct Group {
+    entity: Entity,
+
+    endpoints: Vec<Endpoint>,
+}
+
+/// See Section 8.2.7 of the [specification](https://www.omg.org/spec/DDSI-RTPS/2.5/PDF#page=31)
+#[derive(Debug, PartialEq, PartialOrd, Hash, Eq, Ord)]
+pub struct Endpoint {
+    entity: Entity,
+
+    topic_kind: TopicKind,
+    reliability_level: ReliabilityKind,
+    unicast_locator_list: Vec<Locator>,
+    multicast_locator_list: Vec<Locator>,
+    endpoint_group: EntityId,
+}
 
 #[cfg(test)]
 mod tests {

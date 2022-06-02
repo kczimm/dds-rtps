@@ -11,7 +11,7 @@
 //! the features of RTPS
 #![allow(dead_code)]
 
-pub mod behavior;
+// pub mod behavior;
 // pub mod discovery;
 // pub mod messages;
 pub mod structure;
